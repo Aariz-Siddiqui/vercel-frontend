@@ -1,79 +1,126 @@
-import {React,useEffect,useState} from "react";
-import { createContext,useContext } from "react";
+import React, { useEffect, useState, createContext, useContext } from "react";
+
 export const authContext = createContext();
-export const AuthProvider = ({children}) =>{
-    const [token,setToken] = useState(localStorage.getItem("token"));
-    const [userData,setUserData] = useState();
-    const [cardData, setCardData] = useState([]);
-    const [isLoading,setLoading] = useState(true);
-    const [admin,setAdmin] = useState();
-    const authBearerToken = `Bearer ${token}`;
-    const setTokenInLs = (token)=>{
-            setToken(token);
-            localStorage.setItem("token",token)
-     }
-     const isLoggedIn = !!token;
-    let LogoutUser = (token)=>{
-        setToken(""); //removing the token from the state
+
+export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [userData, setUserData] = useState();
+  const [cardData, setCardData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const [admin, setAdmin] = useState();
+
+  // Base backend URL - use Vite env var in production, fallback to localhost for dev
+  const BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
+  const setTokenInLs = (tkn) => {
+    setToken(tkn);
+    if (tkn) {
+      localStorage.setItem("token", tkn);
+    } else {
+      localStorage.removeItem("token");
+    }
+  };
+
+  const isLoggedIn = !!token;
+
+  const LogoutUser = () => {
+    setToken(""); // removing token from state
+    setAdmin(false);
+    localStorage.removeItem("token"); // removing token from local storage
+  };
+
+  // helper to get Authorization header only when token exists
+  const getAuthHeaders = () => {
+    if (!token) return {};
+    return {
+      Authorization: `Bearer ${token}`,
+    };
+  };
+
+  const authentication = async () => {
+    try {
+      if (!token) {
+        // no token -> skip authentication and clear state
+        setUserData(undefined);
         setAdmin(false);
-        localStorage.removeItem("token"); //removing the token from the local storage
-    }
+        setLoading(false);
+        return;
+      }
 
-    const authentication = async() =>{
-        try{
-            const response = await fetch("http://localhost:8000/api/auth/user",{ //calling user controller which is returning user data after validating the token stored 
-            // in ls and then reriving the payload which contains user email and using findOne() method of mongooose to retrive data associated with that email.
-                method:"GET",
-                headers: {
-                    Authorization: authBearerToken,
-                },
-            }
-            )
-            if(response.ok){
-                let Data = await response.json();
-                setUserData(Data);
-                setLoading(false);
-                console.log("isAdmin is",Data.isAdmin)
-                setAdmin(Data.isAdmin);
-            }
-        }catch(error){
-            console.log("error from the authentication function at auth.jsx" + error)
+      const response = await fetch(`${BASE}/api/auth/user`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        // credentials: 'include' // uncomment only if backend uses cookies/sessions
+      });
+
+      if (response.ok) {
+        const Data = await response.json();
+        setUserData(Data);
+        setAdmin(Data.isAdmin);
+      } else {
+        // token invalid or expired - clear local auth
+        setUserData(undefined);
+        setAdmin(false);
+        // optional: remove token from storage if server says unauthorized
+        if (response.status === 401 || response.status === 403) {
+          setTokenInLs("");
         }
-
-
+      }
+    } catch (error) {
+      console.error("error from the authentication function at auth.jsx", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-
-//to fetch the card details on the services page
-    
-    const getServices = async ()=>{
-        try{
-            const response = await fetch("http://localhost:8000/data/service", {
-                method:"GET"
-            })
-            if(response.ok){
-                const data = await response.json();
-                console.log(data);
-                setCardData(data);
-                
-            }
-        }catch(error){
-            console.log("error from the card/auth.jsx" + error);
-        }
- 
+  // to fetch the card details on the services page
+  const getServices = async () => {
+    try {
+      const response = await fetch(`${BASE}/data/service`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // credentials: 'include' // uncomment for cookie-based auth if needed
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCardData(data);
+      } else {
+        console.error("Failed to load services", response.status);
+      }
+    } catch (error) {
+      console.error("error from the card/auth.jsx", error);
     }
+  };
 
-    useEffect(()=>{
-        getServices();
-        authentication();
-    },[token]);
+  useEffect(() => {
+    getServices();
+    authentication();
+    // run when token changes (login/logout)
+  }, [token]);
 
-    return(
-    <authContext.Provider value={{cardData,userData,isLoggedIn,setTokenInLs,LogoutUser,authBearerToken,token,isLoading,admin}}>
-        {children}
+  return (
+    <authContext.Provider
+      value={{
+        cardData,
+        userData,
+        isLoggedIn,
+        setTokenInLs,
+        LogoutUser,
+        token,
+        isLoading,
+        admin,
+      }}
+    >
+      {children}
     </authContext.Provider>
-    )
-}
-export const useAuth = ()=>{
-    return useContext(authContext);
-}
+  );
+};
+
+export const useAuth = () => {
+  return useContext(authContext);
+};

@@ -48,7 +48,7 @@ export const AuthProvider = ({children}) =>{
     
     const getServices = async ()=>{
         try{
-            const response = await fetch("https://vercel-backend-eight-chi.vercel.app/service", {
+            const response = await fetch("https://vercel-backend-eight-chi.vercel.app/data/service", {
                 method:"GET"
             })
             if(response.ok){

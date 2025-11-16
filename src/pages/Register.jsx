@@ -26,7 +26,7 @@ const {setTokenInLs} = useAuth();
     try{
       e.preventDefault(); // Prevent page refresh
       console.log(`Name: ${user.name}, Email: ${user.email} , Phone:${user.phone}, Password:${user.password}`);
-      const response = await fetch("http://localhost:8000/api/auth/register",{  //sending the data
+      const response = await fetch("https://vercel-backend-eight-chi.vercel.app/api/auth/register",{  //sending the data
         method:"POST",
         headers:{
           "Content-Type":"application/json"

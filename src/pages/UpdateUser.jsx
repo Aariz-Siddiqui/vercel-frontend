@@ -15,7 +15,7 @@ const UpdateUser = () => {
   const {authBearerToken} = useAuth();
   const singleUserData = async ()=>{
       try{
-        const response = await fetch(`http://localhost:8000/api/admin/users/${params.id}`,{
+        const response = await fetch(`https://vercel-backend-eight-chi.vercel.app/api/admin/users/${params.id}`,{
           method:'GET',
           headers:{
             Authorization:authBearerToken
@@ -47,7 +47,7 @@ const UpdateUser = () => {
   const updateUserData = async(e) =>{
     try{
       e.preventDefault();
-      const response = await fetch(`http://localhost:8000/api/admin/users/update/${params.id}`,{
+      const response = await fetch(`https://vercel-backend-eight-chi.vercel.app/api/admin/users/update/${params.id}`,{
         method:"PATCH",
         headers:{
           "Content-Type":"application/json",

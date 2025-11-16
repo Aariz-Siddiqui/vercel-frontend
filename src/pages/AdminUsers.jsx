@@ -5,7 +5,7 @@ const AdminUsers = () => {
   const [data,setData] = useState([]);
   const {authBearerToken} = useAuth();
   const fetchUsersData = async (req, res)=>{
-    const response = await fetch("http://localhost:8000/api/admin/users",{
+    const response = await fetch("https://vercel-backend-eight-chi.vercel.app/api/admin/users",{
       method:"GET",
       headers:{
         Authorization: authBearerToken
@@ -21,7 +21,7 @@ const AdminUsers = () => {
   const deleteUser =async(_id)=>{
     console.log("at delete user function" + _id)
     try{
-      const response = await fetch(`http://localhost:8000/api/admin/delete/${_id}`, {
+      const response = await fetch(`https://vercel-backend-eight-chi.vercel.app/api/admin/delete/${_id}`, {
         method:"DELETE",
         headers:{
             Authorization: authBearerToken,

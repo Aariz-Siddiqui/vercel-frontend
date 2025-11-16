@@ -5,7 +5,7 @@ const AdminContacts = () => {
   const {authBearerToken} = useAuth(); 
   const getContactData =async(req,res)=>{
     try{
-      const response = await fetch("http://localhost:8000/api/admin/contact",{
+      const response = await fetch("https://vercel-backend-eight-chi.vercel.app/api/admin/contact",{
         method:"GET",
         headers:{
           Authorization:authBearerToken
@@ -22,7 +22,7 @@ const AdminContacts = () => {
   }
   const deleteMessage =async (_id)=>{
     try{
-      const response = await fetch(`http://localhost:8000/api/admin/message/delete/${_id}`,{
+      const response = await fetch(`https://vercel-backend-eight-chi.vercel.app/api/admin/message/delete/${_id}`,{
         method:"DELETE",
       })
       if(response.ok){

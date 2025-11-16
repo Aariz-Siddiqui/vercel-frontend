@@ -18,7 +18,7 @@ const AddServices = () => {
 const handleSubmit = async(e)=>{
     e.preventDefault();
     try{
-        const response = await fetch("http://localhost:8000/api/admin/services/addservice",{
+        const response = await fetch("https://vercel-backend-eight-chi.vercel.app/api/admin/services/addservice",{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"

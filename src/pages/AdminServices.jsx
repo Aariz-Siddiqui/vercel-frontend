@@ -6,7 +6,7 @@ const AdminServices = () => {
   const getAllServices = async()=>{
   try{
     console.log(authBearerToken);
-    const response = await fetch("http://localhost:8000/api/admin/services",{
+    const response = await fetch("https://vercel-backend-eight-chi.vercel.app/api/admin/services",{
       method:"GET",
       headers:{
         Authorization:authBearerToken
@@ -23,7 +23,7 @@ useEffect(()=>{getAllServices()}, []);
 
 const deleteService =async (_id)=>{
   try{
-    const response = await fetch(`http://localhost:8000/api/admin/services/delete/${_id}`,{
+    const response = await fetch(`https://vercel-backend-eight-chi.vercel.app/api/admin/services/delete/${_id}`,{
       method:"DELETE",
     })
     if(response.ok){

@@ -3,7 +3,6 @@ import { useAuth } from '../store/auth';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 const Login = () => {
-  const BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
   const {setTokenInLs} = useAuth();
   const [user,setUser] = useState({
@@ -27,7 +26,7 @@ const handleSubmit = async (e)=>{
   try{
     e.preventDefault();
     console.log(user);
-    const response = await fetch(`${BASE}/api/auth/login`,{
+    const response = await fetch('https://vercel-backend-eight-chi.vercel.app/api/auth/login',{
       method:"POST",
       headers:{
         "Content-Type":"application/json"
